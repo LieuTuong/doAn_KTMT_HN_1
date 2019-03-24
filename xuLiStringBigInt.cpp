@@ -173,12 +173,12 @@ string _x_mu_n(int coSo, int soMu)
 
 bool operator>(string a, string b)
 {
-	return false;
+	return Greater(a,b);
 }
 
 bool operator<(string a, string b)
 {
-	return false;
+	return Less(a,b);
 }
 
 // cho do dai 2 chuoi bang nhau de cong 2 chuoi lai
@@ -227,28 +227,6 @@ string subtract(string soTru, string soBiTru)
 		res.erase(0, 1);
 	return res;
 }
-
-//pair<string, string> divide(string n, string den)
-//{
-//	long long rem = 0;
-//	string res;
-//
-//	for (int i = 0, len = n.length(); i < len; ++i)
-//	{
-//		rem = (rem * 10) + stringToNum(n[i]);
-//		res.push_back(numToString(rem / den));
-//		rem %= den;
-//	}
-//
-//	res.resize(n.length());
-//
-//	while (res[0] == '0' && res.length() != 1)
-//		res.erase(0, 1);
-//	if (res.length() == 0)
-//		res = "0";
-//	return make_pair(res,rem);
-//}
-
 
 
 string add(string a, string b)
@@ -340,7 +318,7 @@ bool Less(string n1, string n2)
 
 		if (len1 < len2) return true;
 		if (len1 > len2) return false;
-		return n1 < n2;
+		return n1.compare(n2)<0;
 	}
 	else// deu am
 	{

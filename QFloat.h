@@ -7,37 +7,32 @@ typedef struct
 	uint32_t data[4];
 }QFloat;
 
-string QFloat_To_Arr(const QFloat& number);
-
-QFloat Arr_To_QFloat(const string& binArr);
 
 
 int SoPhanTuSauDauCham(string phanThapPhan);
 
-//Tao so thuc 1 vs n so 0 ngoai sau
 string Float_1(int n);
 
-//chuyen phan thap phan cua QFloat tu Dec -> Bin
-string DecToBin_phanThapPhan(string phanThapPhan);
-
-//Tach phan nguyen va phan thap phan cua QFloat
 void tachQFloat(string bigFloat, string& phanNguyen, string& phanThapPhan);
 
-//Dung voi so duong, sai vs so am do ham DecToBin dua ve 128 bit
-string DecToBin_QFloat(string bigFloat);
+void chuanHoaQFloat(string &number, int &soMu);
 
-//Chuan hoa ve dang ( 1.F * 2^E )
-int chuanHoaQFloat(string& floatNum, int chuan = MAX);
+QFloat Arr_To_QFloat(const string& binArr);
 
-//chuyen phan mu qua nhi phan, chuoi nay chac chan du exp_bit
-string DecToBin_exp(int soMuE, int chuan = MAX);
+string DecToBin_QFloat(string number);
 
-void ScanQFloat(QFloat& x, string Fnum);
+void ScanQFloat(QFloat &x, string number);
+
+string QFloat_To_Arr(const QFloat& number);
+
+void canBangHaiChuoi_2(string &a, string &b);
 
 string _2_Mu_Tru_N(int n);
 
 string BinToDec_PhanThapPhan(string str);
 
+void xoa_0_Cuoi_String(string &str);
+
 string BinToDec_QFloat(string arr);
 
-string _2_Mu_Tru_N(int n);
+void PrintQfloat(QFloat number);

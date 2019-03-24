@@ -22,7 +22,140 @@ vector<string> tachToken(string x)
 	return res;
 }
 
-string _2_chi_thi_p(vector<string>strArr)
+
+
+bool ToanTuGiuaQInt_QInt(string x)
+{
+	return (x == "+" || x == "-" || x == "*" || x == "/"||x=="&"||x=="|"||x=="^");
+}
+
+
+bool ToanTuGiuaQInt_Int(string x)
+{
+	return (x == "<<" || x == ">>" || x == "rol" || x == "ror");
+}
+
+
+QInt tinhToanQInt_QInt(QInt a, QInt b, string toanTu)
+{
+	QInt res;
+	if (toanTu == "+")
+		res = a + b;
+	else if (toanTu == "-")
+		res = a - b;
+	else if (toanTu == "*")
+		res = a * b;
+	else if (toanTu == "/")
+		res = a / b;
+	else if (toanTu == "&")
+		res = a & b;
+	else if (toanTu == "|")
+		res = a | b;
+	else if (toanTu == "^")
+		res = a ^ b;
+	return res;
+}
+
+
+QInt tinhToanQInt_Int(QInt a, int b, string toanTu)
+{
+	QInt res;
+	if (toanTu == "<<")
+		res = a << b;
+	else if (toanTu == ">>")
+		res = a >> b;
+	else if (toanTu == "rol")
+		res = rol(a, b);
+	else if (toanTu == "ror")
+		res = ror(a, b);
+	
+
+	return res;
+}
+
+
+string _1_chi_thi_p_QInt(vector<string> strArr)
+{
+	QInt a, b,resQInt;
+	string res;
+	int heCoSo;
+	 
+	if (strArr[0] == "2")//Neu la he 2
+	{
+		heCoSo = 2;
+		ScanQInt(a, BinToDec(strArr[1]));
+		if (ToanTuGiuaQInt_QInt(strArr[2]))//Neu la toan tu xu li giua QInt voi QInt nhu +, - ,* ,/ ...
+		{
+			ScanQInt(b, BinToDec(strArr[3]));
+			resQInt = tinhToanQInt_QInt(a, b, strArr[2]);
+		}
+		else if (ToanTuGiuaQInt_Int(strArr[2])) //Neu la toan tu xu li giua QInt voi int nhu <<, >>, rol, ror,..
+		{
+			int bit = toInt(BinToDec(strArr[3]));//tu he 2 -> he 10, r chuyen sang so nguyen
+			resQInt = tinhToanQInt_Int(a, bit, strArr[2]);
+		}
+		else // toan tu 1 ngoi nhu ~
+		{
+			resQInt = ~a;
+		}
+	}
+
+	else if (strArr[0] == "10")// Neu la he 10
+	{
+		heCoSo = 10;
+		ScanQInt(a, strArr[1]);
+		if (ToanTuGiuaQInt_QInt(strArr[2]))
+		{
+			ScanQInt(b, strArr[3]);
+			resQInt=tinhToanQInt_QInt(a, b, strArr[2]);
+		}
+		else if (ToanTuGiuaQInt_Int(strArr[2]))
+		{
+			int bit = toInt(strArr[3]);
+			resQInt=tinhToanQInt_Int(a, bit, strArr[2]);
+		}
+		else //toan tu ~
+		{
+			resQInt = ~a;
+		}
+	}
+
+	else // He 16
+	{
+		heCoSo = 16;
+		ScanQInt(a, HexToDec(strArr[1]));
+		if (ToanTuGiuaQInt_QInt(strArr[2]))
+		{
+			ScanQInt(b, HexToDec(strArr[3]));
+			resQInt=tinhToanQInt_QInt(a, b, strArr[2]);
+		}
+		else if (ToanTuGiuaQInt_Int(strArr[2]))
+		{
+			int bit = toInt(HexToDec(strArr[3]));
+			resQInt = tinhToanQInt_Int(a, bit, strArr[2]);
+		}
+		else //toan tu ~
+		{
+			resQInt = ~a;
+		}
+	}
+
+	string resStr = QInt_To_Arr(resQInt);//chuyen tu QInt sang mang nhi phan
+
+	//Tra ket qua theo he co so ma file input de ra
+	if (heCoSo == 10)
+	{
+		resStr = BinToDec(resStr);
+	}
+	else if (heCoSo == 16)
+	{
+		resStr = BinToHex(resStr);
+	}
+	return resStr;
+}
+
+
+string _2_chi_thi_p_QInt(vector<string>strArr)
 {
 	string res;
 	if (strArr[0] == "2")
@@ -37,7 +170,7 @@ string _2_chi_thi_p(vector<string>strArr)
 		}
 	}
 
-	if (strArr[0] == "10")
+	else if (strArr[0] == "10")
 	{
 		if (strArr[1] == "2")// He 10 -> he 2
 		{
@@ -48,82 +181,53 @@ string _2_chi_thi_p(vector<string>strArr)
 			res = DecToHex(strArr[2]);
 		}
 	}
+
+
+	else if (strArr[0] == "16")
+	{
+		if (strArr[1] == "2")
+		{
+			res = HexToBin(strArr[2]);
+		}
+		else if (strArr[1] == "10")
+		{
+			res = HexToDec(strArr[2]);
+		}
+	}
 	return res;
 }
 
-string _1_chi_thi_p(vector<string> strArr)
-{
-	QInt a, b;
-	QInt res;
 
-	if (strArr[2] == "+")
-	{
-		ScanQInt(a, strArr[1]);
-		ScanQInt(b, strArr[3]);
-		res = a + b;
-	}
-	else if (strArr[2] == "-")
-	{
-		ScanQInt(a, strArr[1]);
-		ScanQInt(b, strArr[3]);
-		res = a - b;
-	}
-	else if (strArr[2] == "*")
-	{
-		ScanQInt(a, strArr[1]);
-		ScanQInt(b, strArr[3]);
-		res = a * b;
-	}
-	else if (strArr[2] == "/")
-	{
-		ScanQInt(a, strArr[1]);
-		ScanQInt(b, strArr[3]);
-		res = a / b;
-	}
-	else if (strArr[2] == "<<")
-	{
-		ScanQInt(a, strArr[1]);
-		int bit = toInt(strArr[3]);
-		res = a << bit;
-	}
-	else if (strArr[2] == ">>")
-	{
-		ScanQInt(a, strArr[1]);
-		int bit = toInt(strArr[3]);
-		res = a >> bit;
-	}
-	else if (strArr[2] == "rol")
-	{
-		ScanQInt(a, strArr[1]);
-		res = rol(a);
-
-	}
-	else if (strArr[2] == "ror")
-	{
-		ScanQInt(a, strArr[1]);
-		res = ror(a);
-	}
-	return QInt_To_Arr(res);
-
-}
-
-string XuLiFILE(vector<string> strArr)
+string XuLiFILE_QInt(vector<string> strArr)
 {
 	string res;
 	if (strArr.size() == 3)// 2 chi thi p, thuong la chuyen doi he co so
 	{
-		res = _1_chi_thi_p(strArr);
+		res = _1_chi_thi_p_QInt(strArr);
 	}
 	else if (strArr.size() == 4) //1 chi thi p, thuong la +,-,*,/,<<,>>,rol,ror,...
 	{
-		res = _2_chi_thi_p(strArr);
+		res = _2_chi_thi_p_QInt(strArr);
 	}
 	return res;
 }
 
+string XuLiFILE_QFloat(vector<string> strArr)
+{
+	string res;
+	if (strArr[0] == "2" && strArr[1] == "10")// chuyen tu he 2 -> he 10
+	{
+		res = BinToDec_QFloat(strArr[2]);
+	}
 
+	else if (strArr[0] == "10" && strArr[1] == "2")
+	{
+		res = DecToBin_QFloat(strArr[2]);
+	}
+	return res;
+}
 
-int main()
+int main(int argc, char* argv[])
 {
 	ifstream fi("Text.txt");//Luc nop bai thi sua lai la ifstream fi(argv[1])
 	ofstream fo("output.txt"); //Luc nop bai thi sua lai la ofstream fo(argv[2])
@@ -148,8 +252,15 @@ int main()
 		//Tach chuoi thanh cac token
 		strArr = tachToken(tmp);
 
-		//Xu li tung dong
-		string output = XuLiFILE(strArr);
+		string output;
+		if (argv[argc - 1] == "1")// Xu li FILE QInt
+		{
+			output = XuLiFILE_QInt(strArr);
+		}
+		else //Xu li FILE QFloat
+		{
+			output = XuLiFILE_QFloat(strArr);
+		}
 
 		//viet vao file output
 		fo << output << endl;
@@ -158,20 +269,10 @@ int main()
 	fi.close();
 
 	
-	//Viet cho dung cmd phan QFloat, khi nop nho nop phan nay, nho Uyen test thu coi no co chay ko
-	/*
-	string res;
-	strArr.clear();
-	for (int i=1;i<argc;i++)
-	{
-	strArr.push_back(string(argv[i]);
-	}
-
-	res=2_chi_thi_p(strArr);
-	cout<<res<<endl;
 	
-	*/
 
 	system("pause");
 	return 0;
 }
+
+

@@ -3,7 +3,6 @@
 #include <bitset>
 
 
-string DecToBin(string userInputStr);
 
 // do ko chac unsigned int luon la 4 bytes, nen dung unit32_t
 struct QInt
@@ -121,7 +120,7 @@ QInt Arr_To_QInt(const string& binArr)
 	int n = binArr.length();
 	if (n < 128)
 	{
-		_128bit.insert(0, 128 - n, '0');
+		_128bit.insert(0, MAX - n, '0');
 	}
 
 	QInt number;
@@ -176,13 +175,17 @@ string DecToBin(string userInputStr)
 string BinToDec(string bit)
 {
 	string decNum, tmp;
+	if (bit.length() < MAX)
+	{
+		bit.insert(0,MAX-bit.length(),'0');
+	}
+	
 
-
-	for (int i = 0; i < bit.length(); i++)
+	for (int i = 0; i < MAX; i++)
 	{
 		if (bit[i] == '1')
 		{
-			tmp = _x_mu_n(2, bit.length() - i - 1);
+			tmp = _x_mu_n(2, MAX - i - 1);
 			if (i == 0)// so la so am
 			{
 				tmp = tmp * -1;
@@ -200,7 +203,7 @@ char nibbles(string binVal)
 {
 	char c;
 
-	if (binVal == "0000") c = '0';
+	if (binVal == "0000")      c = '0';
 	else if (binVal == "0001") c = '1';
 	else if (binVal == "0010") c = '2';
 	else if (binVal == "0011") c = '3';
@@ -220,12 +223,59 @@ char nibbles(string binVal)
 	return c;
 }
 
+
+//--------------- Chuyen tu he 16 sang he 2 ----------------------
+string tu16_2(char x)
+{
+	string res;
+
+	if (x == '0')      res = "0000";
+	else if (x == '1') res = "0001";
+	else if (x == '2') res = "0010";
+	else if (x == '3') res = "0011";
+	else if (x == '4') res = "0100";
+	else if (x == '5') res = "0101";
+	else if (x == '6') res = "0110";
+	else if (x == '7') res = "0111";
+	else if (x == '8') res = "1000";
+	else if (x == '9') res = "1001";
+	else if (x == 'A'||x=='a') res = "1010";
+	else if (x == 'B'||x=='b') res = "1011";
+	else if (x == 'C'||x=='c') res = "1100";
+	else if (x == 'D'||x=='d') res = "1101";
+	else if (x == 'E'||x=='e') res = "1110";
+	else if (x == 'F'||x=='f') res = "1111";
+
+	return res;
+		
+}
+
+string HexToBin(string HexStr)
+{
+	string res = "";
+	for (int i = 0; i < HexStr.length(); i++)
+	{
+		res.append(tu16_2(HexStr[i]));
+	}
+	return res;
+}
+
+//-----------------------------------------------------------------
+
+//----------------chuyen tu he 16 sang he 10 (theo chuan 128 bit)----------
+
+string HexToDec(string HexStr)
+{
+	string bin = HexToBin(HexStr);
+	return BinToDec(bin);
+}
+
 // he 2 -> he 16
 string BinToHex(string bin)
 {
 	string res = "0x";
 	int Blen = bin.length();
-	if (Blen % 4 == 1) //neu Blen ko chia het cho 4, thi them n so 0 sao cho (n + Blen) chia het cho 4
+	if (Blen % 4 != 0) //neu Blen ko chia het cho 4, thi them n so 0 sao cho (n + Blen) chia het cho 4
 	{
 		int newLen = 4 * ((Blen / 4) + 1);
 		bin.insert(0, newLen - Blen, '0');
@@ -260,7 +310,7 @@ string DecToHex(string dec)
 	return res;
 }
 
-//Ham nhap so QInt, con thieu cai doc File, ko biet cho 2 tham so co dc ko
+//Ham nhap so QInt
 void ScanQInt(QInt &number, string userInputStr)
 {
 	string binArr = DecToBin(userInputStr);
@@ -486,31 +536,29 @@ QInt operator << (const QInt& a, int bit)
 
 
 
-QInt rol(const QInt& a)
+QInt rol(const QInt& a,int bit)
 {
 	string A = QInt_To_Arr(a);
+	string tmp;
 
-	int MSB = A[0];// giu bit trai nhat 
-	for (int i = 0; i < MAX - 1; i++)
-	{
-		A[i] = A[i + 1];
-	}
-	A[MAX - 1] = MSB;// bit trai nhat thanh bit phai nhat	
+	tmp.assign(A, 0, bit);
+	A.erase(0, bit);
+	A.append(tmp);
+	
 	return  Arr_To_QInt(A);
 }
 
 
 
-QInt ror(const QInt& a)
+QInt ror(const QInt& a,int bit)
 {
 	string A = QInt_To_Arr(a);
+	string tmp;
 
-	int LSB = A[MAX - 1];
-	for (int i = MAX - 1; i > 0; i--)
-	{
-		A[i] = A[i - 1];
-	}
-	A[0] = LSB;
+	tmp.assign(A, 0, MAX - bit);
+	A.erase(0,MAX-bit);
+	A.append(tmp);
+
 	return Arr_To_QInt(A);
 }
 
@@ -518,11 +566,14 @@ QInt ror(const QInt& a)
 
 
 //================================ TOAN TU + - * /
-string CongBit(const string& a, const string& b)
+string CongBit(const string& A, const string& B)
 {
+	string a = A, b = B;
+	canBang2Chuoi(a, b);
+	int n = a.size();
 	int temp = 0;
-	string res(MAX, '0');
-	for (int i = MAX - 1; i >= 0; i--)
+	string res(n, '0');
+	for (int i = n - 1; i >= 0; i--)
 	{
 		temp = stringToNum(a[i]) + stringToNum(b[i]) + temp;
 		if (temp == 2)
@@ -623,7 +674,7 @@ QInt operator * (const QInt& m, const QInt& q)
 	A_Q_Qo.pop_back();
 	res = A_Q_Qo.substr(A_Q_Qo.size() - MAX);
 
-	return Arr_To_QInt(Q);
+	return Arr_To_QInt(res);
 
 }
 

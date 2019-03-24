@@ -81,6 +81,17 @@ string BinToHex(string bin);
 string DecToHex(string dec);
 
 
+//chuyen tu chu cai tu hex sang bin tuong ung
+string tu16_2(char x);
+
+
+//he 16 -> he 2
+string HexToBin(string HexStr);
+
+// he 16 -> he 10
+string HexToDec(string HexStr);
+
+
 //Ham nhap so QInt, con thieu cai doc File, ko biet cho 2 tham so co dc ko
 void ScanQInt(QInt &number, string userInputStr);
 
@@ -139,11 +150,11 @@ QInt operator << (const QInt& a, int bit);
 
 
 
-QInt rol(const QInt& a);
+QInt rol(const QInt& a,int bit);
 
 
 
-QInt ror(const QInt& a);
+QInt ror(const QInt& a,int bit);
 
 //===================================================================================================
 

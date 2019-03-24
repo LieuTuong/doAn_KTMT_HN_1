@@ -1,5 +1,151 @@
 ﻿#include"QFloat.h"
 
+
+
+
+
+int SoPhanTuSauDauCham(string phanThapPhan)
+{
+	int dauCham = phanThapPhan.find_first_of('.');
+	return phanThapPhan.length() - dauCham - 1;
+}
+string Float_1(int n)
+{
+	string res = "1.";
+	for (int i = 0; i < n; i++)
+	{
+		res.push_back('0');
+	}
+	return res;
+}
+
+
+void tachQFloat(string bigFloat, string& phanNguyen, string& phanThapPhan)
+{
+	int len = bigFloat.length();
+	int dauCham = bigFloat.find_first_of('.');
+	phanNguyen.assign(bigFloat, 0, dauCham);
+	phanThapPhan.assign(bigFloat, dauCham, len - phanNguyen.length());//dg co dang (.x)
+	phanThapPhan.insert(0, 1, '0');//dua ve dang (0.x)
+}
+
+
+void chuanHoaQFloat(string &number, int &soMu)
+{
+	string phanNguyen, phanThapPhan;
+	tachQFloat(number, phanNguyen, phanThapPhan);
+	phanNguyen = DecToBin(phanNguyen);
+
+	bool kiemTra = false;
+	bool kiemTra_1 = false; // neu so 1 nam o trong phan thap phan
+	bool flag = false;
+	int n_PhanNguyen = phanNguyen.size();
+
+	int i = 0; // luu so luong chu so sau 1 cua phan nguyen
+	if (phanNguyen[0] == '1')
+	{
+		i = n_PhanNguyen - 1;
+		kiemTra = true;
+		flag = true;
+	}
+	string sub = phanNguyen.substr(n_PhanNguyen - i);
+
+	string res;
+	res += sub; // ket qua
+	string tmp;
+	int k = 0, m = 0; // bien dem 
+	int j = 0; // luu vi tri so 1 dau tien cua phan thap phan
+	int len_sauDauCham;
+	string so1;		// de tao chuoi string = 1 de kiem tra sau khi * 2
+	bool kiemTra_2 = false;  // 
+	while (1)
+	{
+		phanThapPhan = phanThapPhan * 2;
+		len_sauDauCham = SoPhanTuSauDauCham(phanThapPhan);
+		so1 = Float_1(len_sauDauCham);  // tao so 1 
+		if (phanThapPhan == so1)
+		{
+			tmp.push_back('1');
+			break;
+		}
+		else if (phanThapPhan > so1)
+		{
+			if (kiemTra_2 == false)
+			{
+				kiemTra_1 = true;
+			}
+			tmp.push_back('1');
+			int DauCham = phanThapPhan.find_first_of('.');
+			for (int i = 0; i < DauCham; i++)
+			{
+				phanThapPhan[i] = '0';
+			}
+		}
+		else
+		{
+			tmp.push_back('0');
+		}
+
+		k++; // tang k
+		if (kiemTra_2 == false && kiemTra_1 == true)
+		{
+			j = k;
+			kiemTra_2 = true;
+			kiemTra = true;
+		}
+		if (kiemTra == true)
+		{
+			m++;
+		}
+		if (flag == true)
+		{
+			if (m == 112 - i)
+			{
+				break;
+			}
+		}
+		else
+		{
+			if (m == 112 - i + 1)
+			{
+				break;
+			}
+		}
+	}
+
+	if (kiemTra_1 == false && flag == false)
+	{
+		j = tmp.size();
+		tmp = "0";
+	}
+	else
+	{
+		if (flag == false)
+		{
+			tmp = remove0(tmp);
+			tmp.erase(0, 1);
+		}
+	}
+	res += tmp;
+	if (m + i >= 112)
+	{
+		phanThapPhan = phanThapPhan * 2;
+		len_sauDauCham = SoPhanTuSauDauCham(phanThapPhan);
+		so1 = Float_1(len_sauDauCham);
+		if (phanThapPhan == so1 || phanThapPhan > so1)
+		{
+			res = CongBit(res, "1");
+		}
+	}
+	string ketQua;
+	soMu = flag == false ? -j : i;
+	ketQua += "1.";
+	ketQua += res;
+	number = ketQua;
+}
+
+
+
 QFloat Arr_To_QFloat(const string& binArr)
 {
 
@@ -14,6 +160,45 @@ QFloat Arr_To_QFloat(const string& binArr)
 	return number;
 }
 
+
+string DecToBin_QFloat(string number)
+{
+	string res;
+	if (IsSign(number) == true)
+	{
+		res.push_back('1');
+		number.erase(0, 1);
+	}
+	else
+	{
+		res.push_back('0');
+	}
+	int E;
+	chuanHoaQFloat(number, E);
+	E += 16383;
+	string str_E = DecToBin(to_string(E));
+	if (str_E.size() < 15)
+	{
+		str_E.insert(0, 1, '0');
+	}
+	number.erase(0, 2);
+
+	int n = number.size();
+	if (n < 112)
+	{
+		number.insert(n, 112 - n, '0');
+	}
+	res = res + str_E + number;
+	return res;
+}
+
+void ScanQFloat(QFloat &x, string number)
+{
+	string res;
+	res = DecToBin_QFloat(number);
+	cout << res << endl;
+	x = Arr_To_QFloat(res);
+}
 
 string QFloat_To_Arr(const QFloat& number)
 {
@@ -32,188 +217,20 @@ string QFloat_To_Arr(const QFloat& number)
 	return a;
 }
 
-int SoPhanTuSauDauCham(string phanThapPhan)
-{
-	int dauCham = phanThapPhan.find_first_of('.');
-	return phanThapPhan.length() - dauCham - 1;
-}
-
-//Tao so thuc 1 vs n so 0 ngoai sau
-string Float_1(int n)
-{
-	string res = "1.";
-	for (int i = 0; i < n; i++)
-		res.push_back('0');
-	return res;
-}
 
 
-//chuyen phan thap phan cua QFloat tu Dec -> Bin
-string DecToBin_phanThapPhan(string phanThapPhan)
+void canBangHaiChuoi_2(string &a, string &b)
 {
-	string res;
-	while (1)
+	int a_len = a.length(), b_len = b.length();
+	if (a_len > b_len)
 	{
-		phanThapPhan = phanThapPhan * 2;
-		int len_sauDauCham = SoPhanTuSauDauCham(phanThapPhan);
-		string so1 = Float_1(len_sauDauCham);
-
-		if (phanThapPhan.compare(so1) == 0)
-		{
-			res.push_back('1');
-			break;
-		}
-		else if (phanThapPhan.compare(so1) == 1)
-		{
-			res.push_back('1');
-			int DauCham = phanThapPhan.find_first_of('.');
-			for (int i = 0; i < DauCham; i++)
-				phanThapPhan[i] = '0';
-		}
-		else
-		{
-			res.push_back('0');
-		}
+		b.insert(b_len, a_len - b_len, '0');
 	}
-	return res;
-}
-
-
-//Tach phan nguyen va phan thap phan cua QFloat
-void tachQFloat(string bigFloat, string& phanNguyen, string& phanThapPhan)
-{
-	int len = bigFloat.length();
-	int dauCham = bigFloat.find_first_of('.');
-
-	phanNguyen.assign(bigFloat, 0, dauCham);
-
-	phanThapPhan.assign(bigFloat, dauCham, len - phanNguyen.length());//dg co dang (.x)
-	phanThapPhan.insert(0, 1, '0');//dua ve dang (0.x)
-}
-
-
-//Ca so am va so duong deu dua ve 128 bit, cat toi dau day
-string DecToBin_QFloat(string bigFloat)
-{
-	string res, phanNguyen, phanThapPhan;
-
-	//tach rieng ( phan nguyen ) va ( phan thap phan )
-	tachQFloat(bigFloat, phanNguyen, phanThapPhan);
-
-	//chuyen phan nguyen sang nhi phan
-	res = DecToBin(phanNguyen);
-
-	//Vi ham DecToBin luôn trả về mảng 128 phần tử, nên phải cắt bớt các số 0 ở đầu
-	remove0(res);
-
-	res.append("."); // them dau . de ngan cach phan nguyen va phan thap phan
-
-	res.append(DecToBin_phanThapPhan(phanThapPhan));// chuyen phan thap phan sang nhi phan, sau do gop chuoi
-
-	return res;
-}
-
-//Chuan hoa ve dang ( 1.F * 2^E )
-int chuanHoaQFloat(string& floatNum, int chuan = MAX)
-{
-	// Cai switch nay chi de co the test may so nho, luc nop bai thi xoa
-	int bit = 112;
-	switch (chuan)
+	else
 	{
-	case 32:
-		bit = 23;
-		break;
-	case 64:
-		bit = 52;
-		break;
-	default:
-		cout << "\nChuan ko hop le" << endl;
-		break;
+		a.insert(a_len, b_len - a_len, '0');
 	}
-
-	//Vi chi su dung phan F, neu i = (vi tri so 1 dau tien), xoa cac ki tu tu i tro ve truoc
-
-	int dauCham = floatNum.find_first_of('.');
-	int so1DauTien = floatNum.find_first_of('1');
-
-	floatNum.erase(dauCham, 1);//xoa dau cham cu
-	floatNum.erase(0, so1DauTien + 1);//xoa cac ki tu i tro ve truoc
-
-	//Them 0 vao cuoi sao cho du so bit
-	if (floatNum.length() < bit)
-		floatNum.insert(floatNum.length(), bit - floatNum.length(), '0');
-
-	return  (dauCham > so1DauTien) ? dauCham - so1DauTien - 1 : dauCham - so1DauTien;// so mu E
-
 }
-
-//chuyen phan mu qua nhi phan, chuoi nay chac chan du exp_bit
-string DecToBin_exp(int soMuE, int chuan = MAX)
-{
-	int k = 15;
-	switch (chuan)
-	{
-	case 32:
-		k = 8;
-		break;
-	case 64:
-		k = 11;
-		break;
-	default:
-		cout << "\nChuan ko hop le." << endl;
-		break;
-	}
-
-
-	int bias = pow(2, k - 1) - 1;
-	int exp = soMuE + bias;
-	string bin = toString(exp);
-
-	bin = DecToBin(bin);//chuyen qua nhi phan
-
-	//De chac chan chuoi nay du exp_bit
-	if (bin.length() < k)//Neu thieu thi them 0 vao dau chuoi
-		bin.insert(0, k - bin.length(), '0');
-	else if (bin.length() > k)//Neu du thi cat sao cho con exp_bit
-		bin.erase(0, bin.length() - k);
-
-	return bin;
-}
-
-
-void ScanQFloat(QFloat& x, string Fnum)
-{
-	/*B1: Xet dau Fnum
-	  B2: Chuyen Fnum sang nhi phan
-	  B3: Chuyen hoa ve dang 1.F * 2^E
-	  B4: Tinh exp va chuyen exp sang nhi phan
-	  B5: Gop chuoi lai thanh chuoi hoan chinh Sign_EXP_Fraction
-
-	*/
-	string res;
-
-	char SignBit = IsSign(Fnum) ? '1' : '0';//B1
-	string Fbin = DecToBin_QFloat(Fnum);//B2
-	int E = chuanHoaQFloat(Fbin, 32);// B3, dg tinh theo chuan 32 bit
-	string exp_bin = DecToBin_exp(E, 32);//B4
-	//B5
-	res.push_back(SignBit);
-	//res.push_back(' ');
-	res.append(exp_bin);
-	//res.push_back(' ');
-	res.append(Fbin);
-
-	x = Arr_To_QFloat(res);
-	
-	//Luc nop bai xoa cai nay
-	cout << endl;
-	for (int i = 0; i < 4; i++)
-	{
-		cout << bitset<32>(x.data[i]);
-	}
-	
-}
-
 string _2_Mu_Tru_N(int n)
 {
 	string res = "1";
@@ -240,7 +257,7 @@ string BinToDec_PhanThapPhan(string str)
 		if (str[i] == '1')
 		{
 			tmp = _2_Mu_Tru_N(i + 1);
-			canBang2Chuoi(tmp, res);
+			canBangHaiChuoi_2(tmp, res);
 			res = res + tmp;
 		}
 	}
@@ -260,7 +277,6 @@ void xoa_0_Cuoi_String(string &str)
 	str.erase(i + 1);
 }
 
-
 string BinToDec_QFloat(string arr)
 {
 	string res;
@@ -276,14 +292,32 @@ string BinToDec_QFloat(string arr)
 	S = arr.substr(15);
 
 	string E = BinToDec(E_str);
-	E = E - "16383";
+	if (E > "16383")
+	{
+		E = E - "16383";
+	}
+	else
+	{
+		E = "16383" - E;
+		E.insert(0, 1, '-');
+	}
 
 	xoa_0_Cuoi_String(S);
 	string x = "1." + S;
 	x.erase(1, 1);// xoa dau . 
 
 	//them dau . vao
-	x.insert(stoi(E) + 1, 1, '.');
+	int doDoi = stoi(E);
+	if (doDoi > 0)
+	{
+		x.insert(doDoi + 1, 1, '.');
+	}
+	else
+	{
+		x.insert(0, abs(doDoi), '0');
+		x.insert(1, 1, '.');
+
+	}
 
 	string PhanNguyen, PhanThapPhan;
 	tachQFloat(x, PhanNguyen, PhanThapPhan);
@@ -303,7 +337,6 @@ string BinToDec_QFloat(string arr)
 	return res;
 }
 
-
 void PrintQfloat(QFloat number)
 {
 	string arr = QFloat_To_Arr(number);
@@ -311,3 +344,4 @@ void PrintQfloat(QFloat number)
 	cout << res;
 
 }
+
